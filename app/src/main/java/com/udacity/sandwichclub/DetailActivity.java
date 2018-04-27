@@ -6,6 +6,7 @@ package com.udacity.sandwichclub;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.MenuItem;
@@ -71,16 +72,26 @@ public class DetailActivity extends AppCompatActivity {
                 .into(ingredientsIv);
 
         setTitle(sandwich.getMainName());
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
+
+        /*
+         * add up-action button to ActionBar as documented at:
+         *      https://developer.android.com/training/appbar/up-action
+         */
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null)
+            actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
+     /*
+      *  Documentation at https://developer.android.com/training/appbar/up-action states that by
+      *  default the up/home action is handled by default.  However, this does not seem to work
+      *  thus the need for the onOptionsItemSelected method.
+      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int itemId = item.getItemId();
-        if (itemId == android.R.id.home) {
-            onBackPressed();
+        int clickedItemId = item.getItemId();
+        if (clickedItemId == android.R.id.home) {
+            finish();
             return true;
         }
         return super.onOptionsItemSelected(item);
