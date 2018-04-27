@@ -4,6 +4,8 @@
 
 package com.udacity.sandwichclub.utils;
 
+import android.util.Log;
+
 import com.udacity.sandwichclub.model.Sandwich;
 
 import java.util.ArrayList;
@@ -81,10 +83,62 @@ public class JsonUtils {
             }
         }
 
+        // ensure completely empty sandwich is not returned
+        int count = 0;
+        for (String key: sandwichMap.keySet()) {
+            Object value = sandwichMap.get(key);
+            if (value instanceof String) {
+                if (! value.equals("-")) {
+                    count++;
+                }
+            } else {
+                try {
+                    List vlist = (List)value;
+                    if (!vlist.isEmpty()) {
+                        String string_value = (String)vlist.get(0);
+                        if (! string_value.equals("-")) {
+                            count++;
+                        }
+                    }
+                } catch (ClassCastException e) {
+                    Log.e("Sandwich", "Unable to validate sandwich");
+                    Log.e("Sandwich", e.getMessage());
+                    Log.i("Json", json);
+                    return null;
+                }
+            }
+        }
+
+        if (count == 0) {
+            return null;
+        }
+
+        // ensure class cast exception are caught
+        List<String> alsoKnownAs = null;
+        if (sandwichMap.containsKey("alsoKnownAs")) {
+            try {
+                alsoKnownAs = (List<String>) sandwichMap.get("alsoKnownAs");
+            } catch (ClassCastException e) {
+                Log.e("Sandwich", "Unable to cast alsoKnownAs");
+                Log.e("Sandwich", e.getMessage());
+                return null;
+            }
+        }
+
+        List<String>ingredients = null;
+        if (sandwichMap.containsKey("ingredients")) {
+            try {
+                ingredients = (List<String>) sandwichMap.get("ingredients");
+            } catch (ClassCastException e) {
+                Log.e("Sandwich", "Unable to cast ingredients");
+                Log.e("Sandwich", e.getMessage());
+                return null;
+            }
+        }
+
         // create and return the sandwich that was found
-        return new Sandwich((String)sandwichMap.get("mainName"),
-                (List<String>)sandwichMap.get("alsoKnownAs"),
+        return new Sandwich((String)sandwichMap.get("mainName"), alsoKnownAs,
                 (String)sandwichMap.get("placeOfOrigin"), (String)sandwichMap.get("description"),
-                (String)sandwichMap.get("image"), (List<String>)sandwichMap.get("ingredients"));
+                (String)sandwichMap.get("image"), ingredients);
     }
 }
